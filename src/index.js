@@ -1,7 +1,7 @@
 import express from 'express';
 //const mongoose = require('mongoose');
 import "dotenv/config";
-import authRoutes from "./routes/authroutes.js";
+import authRoutes from "./routes/authRoutes.js";
 
 import connectDB from "./lib/db.js";
 

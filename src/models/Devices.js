@@ -31,6 +31,9 @@ const deviceSchema = new mongoose.Schema({
         type: String,
         default: 'stop',
     },
+    {
+        timestamps: true,
+    }
 })
 
 const Device = mongoose.model('Device', deviceSchema);

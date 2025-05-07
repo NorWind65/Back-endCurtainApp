@@ -9,6 +9,7 @@ const generateAuthToken = (user) => {
   });
   return token;
 }
+
 router.post("/login", async (req, res) => {
   try {
     const { email, password } = req.body;
