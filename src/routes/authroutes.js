@@ -7,7 +7,11 @@ router.post("/login", async (req, res) => {
 });
 
 router.post("/signup", async (req, res) => {
-    res.send("signup");
+    try {
+      
+    } catch (error) {
+      
+    }
 });
   
 
