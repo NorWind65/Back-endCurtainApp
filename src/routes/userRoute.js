@@ -6,9 +6,10 @@ import protectUserRoute from "../middleware/user.middleware.js";
 
 const router = express.Router();
 
-router.get("/getDevice", protectUserRoute, async (req, res) => {
+router.get("/getDevice", protectUserRoute , async (req, res) => {
     try {
-        const user = await User.findById(req.user._id).populate("deviceId").select("-password");
+        const ID =  req.user._id; //"681b5f1db01e02ec04bd115b"; 
+        const user = await User.findById(ID).populate("deviceId").select("-password");
         return res.status(200).json(user.deviceId);
     } catch (error) {
         console.log("Error in getting user", error);
@@ -16,14 +17,14 @@ router.get("/getDevice", protectUserRoute, async (req, res) => {
     }
 });
 
-router.put("/addDevice",protectUserRoute ,async (req, res) => {
+router.put("/addDevice" , protectUserRoute ,async (req, res) => {
   try {
     const { deviceId, password } = req.body;
     if (!deviceId || !password) {
       return res.status(400).json({ message: "Please fill all fields" });
     }
     // check if device not exists
-    const device = await Device.find({ deviceId });     
+    const device = await Device.findOne({ deviceId });     
     if(!device) {
       return res.status(400).json({ message: "Invalid Device" });
     }
@@ -33,8 +34,8 @@ router.put("/addDevice",protectUserRoute ,async (req, res) => {
     if (!isPasswordValid) {
       return res.status(400).json({ message: "Invalid Device" });
     }
-
-    const user = await User.findById(req.user._id);
+    const ID =  req.user._id; // "681b5f1db01e02ec04bd115b";
+    const user = await User.findById(ID);
 
 
     user.deviceId.push(device._id);
@@ -46,16 +47,16 @@ router.put("/addDevice",protectUserRoute ,async (req, res) => {
     res.status(500).json({ message: "Internal server error" });
   }
 });
-router.put("/removeDevice/:id",protectUserRoute ,async (req, res) => {
+router.put("/removeDevice/", protectUserRoute ,async (req, res) => {
     try {
-        const { deviceId } = req.params.id;
+        const  deviceId  = req.body.device_Id;
         // check if device not exists
         const device = await Device.findById(deviceId);     
         if(!device) {
             return res.status(400).json({ message: "Invalid Device" });
         }
-
-        const user = await User.findById(req.user._id);
+        const ID =  req.user._id;//  "681b5f1db01e02ec04bd115b"; 
+        const user = await User.findById(ID);
         user.deviceId = user.deviceId.filter((d) => d.toString() !== device._id.toString());
         await user.save();
         return res.status(200).json(user);

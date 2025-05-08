@@ -45,8 +45,8 @@ deviceSchema.pre('save', async function(next) {
 );
 
 //compare password with hashed password
-deviceSchema.methods.comparePassword = async function(userPassword) {
-    return await bcrypt.compare(userPassword, this.password);
+deviceSchema.methods.comparePassword = async function(devicePassword) {
+    return await bcrypt.compare(devicePassword, this.password);
 }
 
 const Device = mongoose.model('Device', deviceSchema);
