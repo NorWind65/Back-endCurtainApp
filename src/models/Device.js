@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import bcrypt from 'bcryptjs';
 
 const deviceSchema = new mongoose.Schema({
     deviceId: {
@@ -30,11 +31,23 @@ const deviceSchema = new mongoose.Schema({
     cmd: {
         type: String,
         default: 'stop',
-    },
-    {
-        timestamps: true,
     }
-})
+},{timestamps: true,})
+
+
+// hash password before saving to database
+deviceSchema.pre('save', async function(next) {
+    if (!this.isModified('password')) return next();
+    const salt = await bcrypt.genSalt(10);
+    this.password = await bcrypt.hash(this.password, salt);
+    next();
+    }
+);
+
+//compare password with hashed password
+deviceSchema.methods.comparePassword = async function(userPassword) {
+    return await bcrypt.compare(userPassword, this.password);
+}
 
 const Device = mongoose.model('Device', deviceSchema);
 
