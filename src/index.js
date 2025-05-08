@@ -5,11 +5,13 @@ import cors from "cors";
 import authRoutes from "./routes/authRoutes.js";
 import userRoutes from "./routes/userRoute.js";
 import deviceRoutes from "./routes/deviceRoute.js";
+import job from "./lib/cron.js";
 import connectDB from "./lib/db.js";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+job.start(); // Start the cron job
 app.use(express.json());
 app.use(cors());
 
