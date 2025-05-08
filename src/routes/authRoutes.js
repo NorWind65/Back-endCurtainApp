@@ -79,7 +79,7 @@ router.post("/signup", async (req, res) => {
      
       res.status(201).json({ 
         token,
-        newUser: {
+        user: {
           id: newUser._id,
           email: newUser.email,
           username: newUser.username,
