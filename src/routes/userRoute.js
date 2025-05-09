@@ -37,6 +37,9 @@ router.put("/addDevice" , protectUserRoute ,async (req, res) => {
     const ID =  req.user._id; // "681b5f1db01e02ec04bd115b";
     const user = await User.findById(ID);
 
+    if (user.deviceId.includes(device._id)) {
+      return res.status(400).json({ message: "Device already added to your account" });
+    }
 
     user.deviceId.push(device._id);
     await user.save();
