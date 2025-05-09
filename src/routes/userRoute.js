@@ -21,8 +21,7 @@ router.get("/getDevice", protectUserRoute , async (req, res) => {
     try {
         const ID =  req.user._id; //"681b5f1db01e02ec04bd115b"; 
         const user = await User.findById(ID).select("-password");
-
-        const DeviceId = req.body.deviceId;
+        const DeviceId = req.params.deviceId;
         const device = await Device.findOne({ deviceId });     
         if (!user.deviceId.includes(device._id)) {
           return res.status(400).json({ message: "Not Found Device" });
