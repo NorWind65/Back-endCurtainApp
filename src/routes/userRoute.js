@@ -6,13 +6,31 @@ import protectUserRoute from "../middleware/user.middleware.js";
 
 const router = express.Router();
 
-router.get("/getDevice", protectUserRoute , async (req, res) => {
+router.get("/getDevices", protectUserRoute , async (req, res) => {
     try {
         const ID =  req.user._id; //"681b5f1db01e02ec04bd115b"; 
         const user = await User.findById(ID).populate("deviceId").select("-password");
         return res.status(200).json(user.deviceId);
     } catch (error) {
         console.log("Error in getting user", error);
+        res.status(500).json({ message: "Internal server error" });
+    }
+});
+
+router.get("/getDevice", protectUserRoute , async (req, res) => {
+    try {
+        const ID =  req.user._id; //"681b5f1db01e02ec04bd115b"; 
+        const user = await User.findById(ID).select("-password");
+
+        const DeviceId = req.body.deviceId;
+        const device = await Device.findOne({ deviceId });     
+        if (!user.deviceId.includes(device._id)) {
+          return res.status(400).json({ message: "Not Found Device" });
+        }
+
+        return res.status(200).json(device);
+    } catch (error) {
+        console.log("Error ", error);
         res.status(500).json({ message: "Internal server error" });
     }
 });

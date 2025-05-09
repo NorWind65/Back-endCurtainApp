@@ -4,6 +4,7 @@ import Device from "../models/Device.js";
 import jwt from "jsonwebtoken";
 const router = express.Router();
 
+
 router.post("/signDevice", async (req, res) => {
   try {
     const { deviceId, password } = req.body;
