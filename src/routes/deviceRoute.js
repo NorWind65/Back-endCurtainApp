@@ -50,10 +50,10 @@ router.put("/resetDevice/" ,async (req, res) => {
 });
 
 // Device 
-router.get("/getDevices", async (req, res) => {
+router.get("/getDevice", async (req, res) => {
   try {
     const {deviceId }= req.query;
-    const devices = await Device.findbyId(deviceId); 
+    const devices = await Device.find({deviceId}).select("-password"); 
     if (!devices) {
       return res.status(400).json({ message: "No Devices" });
     }
