@@ -49,4 +49,21 @@ router.put("/resetDevice/" ,async (req, res) => {
   }
 });
 
+// Device 
+router.get("/getDevices", async (req, res) => {
+  try {
+    const {deviceId }= req.query;
+    const devices = await Device.findbyId(deviceId); 
+    if (!devices) {
+      return res.status(400).json({ message: "No Devices" });
+    }
+    return res.status(200).json(devices);
+  } catch (error) {
+    console.log("Error in getting devices", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+
+
 export default router;
