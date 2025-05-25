@@ -95,7 +95,7 @@ router.put("/updateTimeOC", protectUserRoute ,async (req, res) => {
             return res.status(400).json({ message: "Please fill all fields" });
         }
         // check if device exists
-        const device = await Device.findById(deviceId);
+        const device = await Device.findOne({deviceId: deviceId});
         if (!device) {
             return res.status(400).json({ message: "Invalid Device" });
         }
@@ -124,7 +124,7 @@ router.put("/updateDeviceName", protectUserRoute ,async (req, res) => {
             return res.status(400).json({ message: "Please fill all fields" });
         }
         // check if device exists
-        const device = await Device.findById(deviceId);
+       const device = await Device.findOne({deviceId: deviceId});
         if (!device) {
             return res.status(400).json({ message: "Invalid Device" });
         }
@@ -153,7 +153,7 @@ router.put("/sendCmd", protectUserRoute ,async (req, res) => {
             return res.status(400).json({ message: "Please fill all fields" });
         }
         // check if device exists
-        const device = await Device.findById(deviceId);
+        const device = await Device.findOne({deviceId: deviceId});
         if (!device) {
             return res.status(400).json({ message: "Invalid Device" });
         }
