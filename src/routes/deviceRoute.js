@@ -65,5 +65,26 @@ router.get("/getDevice", async (req, res) => {
 });
 
 
+router.put("/updateLight", async (req, res) => {
+  try {
+    const { light } = req.body;
+    const { deviceId } = req.query;
+    if (!deviceId || light === undefined) {
+      return res.status(400).json({ message: "Please fill all fields" });
+    }
+    // check if device exists
+    const device = await Device.findOne({ deviceId });
+    if (!device) {
+      return res.status(400).json({ message: "Device not found" });
+    }
+    device.light = light;
+    await device.save();
+    return res.status(200).json(device);
+  } catch (error) {
+    console.log("Error in updating light", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
 
 export default router;

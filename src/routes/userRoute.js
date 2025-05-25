@@ -88,4 +88,90 @@ router.put("/removeDevice/", protectUserRoute ,async (req, res) => {
     }
 });
 
+router.put("/updateTimeOC", protectUserRoute ,async (req, res) => {
+    try {
+        const { deviceId, timeOC } = req.body;
+        if (!deviceId || !timeOC) {
+            return res.status(400).json({ message: "Please fill all fields" });
+        }
+        // check if device exists
+        const device = await Device.findById(deviceId);
+        if (!device) {
+            return res.status(400).json({ message: "Invalid Device" });
+        }
+        // check if user has access to the device
+        const ID =  req.user._id; // "681b5f1db01e02ec04bd115b";
+        const user = await User.findById(ID);
+        if (!user.deviceId.includes(device._id)) {
+            return res.status(400).json({ message: "You don't have access to this device" });
+        }
+        
+        device.timeOC = timeOC;
+        await device.save();
+
+        return res.status(200).json({ message: 'Time OC updated successfully'});
+
+    } catch (error) {
+        console.log("Error in updating time OC", error);
+        res.status(500).json({ message: "Internal server error" });
+    }
+});
+
+router.put("/updateDeviceName", protectUserRoute ,async (req, res) => {
+    try {
+        const { deviceId, deviceName } = req.body;
+        if (!deviceId || !deviceName) {
+            return res.status(400).json({ message: "Please fill all fields" });
+        }
+        // check if device exists
+        const device = await Device.findById(deviceId);
+        if (!device) {
+            return res.status(400).json({ message: "Invalid Device" });
+        }
+        // check if user has access to the device
+        const ID =  req.user._id; // "681b5f1db01e02ec04bd115b";
+        const user = await User.findById(ID);
+        if (!user.deviceId.includes(device._id)) {
+            return res.status(400).json({ message: "You don't have access to this device" });
+        }
+        
+        device.deviceName = deviceName;
+        await device.save();
+
+        return res.status(200).json({ message: 'Device name updated successfully'});
+
+    } catch (error) {
+        console.log("Error in updating device name", error);
+        res.status(500).json({ message: "Internal server error" });
+    }
+});
+
+router.put("/sendCmd", protectUserRoute ,async (req, res) => {
+    try {
+        const { deviceId, cmd } = req.body;
+        if (!deviceId || !cmd) {
+            return res.status(400).json({ message: "Please fill all fields" });
+        }
+        // check if device exists
+        const device = await Device.findById(deviceId);
+        if (!device) {
+            return res.status(400).json({ message: "Invalid Device" });
+        }
+        // check if user has access to the device
+        const ID =  req.user._id; // "681b5f1db01e02ec04bd115b";
+        const user = await User.findById(ID);
+        if (!user.deviceId.includes(device._id)) {
+            return res.status(400).json({ message: "You don't have access to this device" });
+        }
+        
+        device.cmd = cmd;
+        await device.save();
+
+        return res.status(200).json({ message: 'Send cmd successfully'});
+
+    } catch (error) {
+        console.log("Error in sending command", error);
+        res.status(500).json({ message: "Internal server error" });
+    }
+});
 export default router;
