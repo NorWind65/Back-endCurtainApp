@@ -28,9 +28,29 @@ const deviceSchema = new mongoose.Schema({
         type: Number,
         default: 0,
     },
+    isOpenTime:{
+        type: Boolean,
+        default: false,
+    }
+    OpenTime: {
+        type: Date,
+        default: null,
+    },
+    isCloseTime:{
+        type: Boolean,
+        default: false,
+    },
+    CloseTime: {
+        type: Date,
+        default: null,
+    },
+    autoMode: {
+        type: Boolean,
+        default: false,
+    },
     cmd: {
         type: String,
-        default: 'stop',
+        default: 'S',
     }
 },{timestamps: true,})
 

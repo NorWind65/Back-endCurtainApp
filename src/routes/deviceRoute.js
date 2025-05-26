@@ -86,5 +86,28 @@ router.put("/updateLight", async (req, res) => {
   }
 });
 
+router.put("/updatePercent", async (req, res) => {
+  try {
+    const { percent } = req.body;
+    const { deviceId } = req.query;
+    if (!deviceId || percent === undefined) {
+      return res.status(400).json({ message: "Please fill all fields" });
+    }
+    // check if device exists
+    const device = await Device.findOne({ deviceId });
+    if (!device) {
+      return res.status(400).json({ message: "Device not found" });
+    }
+    device.percent = percent;
+    await device.save();
+    return res.status(200).json(device);
+  } catch (error) {
+    console.log("Error in updating percent", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+router.put("/updateAutoMode", async )
+
 
 export default router;
