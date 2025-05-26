@@ -6,16 +6,72 @@ import protectUserRoute from "../middleware/user.middleware.js";
 
 const router = express.Router();
 
+
+router.put("/updateInfo", protectUserRoute, async (req, res)=>{
+    try{
+        const { newEmail, newUserName, newPassword, oldPassword } = req.body;
+        const ID =  req.user._id ; //"681b5f1db01e02ec04bd115b";
+        const user = await User.findById(ID).select("-password");
+
+        const isPasswordValid = await user.comparePassword(oldPassword);
+        if (!isPasswordValid) {
+            return res.status(400).json({ message: "Invalid old Password" });
+        }
+
+        if(newPassword.length < 6) {
+            return res.status(400).json({ message: "Password must be at least 6 characters" });
+        }
+
+        if(newUserName.length < 3) {
+            return res.status(400).json({ message: "Username must be at least 3 characters" });
+        }
+        if( newUserName != user.username){
+            const existingUsername = await User.findOne( { newUserName } );  
+            if (existingUsername ) {
+                return res.status(400).json({ message: "Username already exists" });
+            }
+        }
+        if( newEmail != user.email){
+            const existingEmail = await User.findOne( { email } );
+            if (existingEmail) {
+                return res.status(400).json({ message: "Email already exists" });
+            }
+        }
+
+        user.username = newUserName;
+        user.email = newEmail;
+        user.password = newPassword;
+        await user.save();
+        
+        return res.status(200).json({
+            user: {
+                id: user._id,
+                email: user.email,
+                username: user.username,
+            },
+        })
+
+
+
+    }catch (error) {
+        console.log("Error in getting user", error);
+        res.status(500).json({ message: "Internal server error" });
+    }
+
+})
+
 router.get("/getDevices", protectUserRoute , async (req, res) => {
     try {
         const ID =  req.user._id; //"681b5f1db01e02ec04bd115b"; 
         const user = await User.findById(ID).populate("deviceId").select("-password");
         return res.status(200).json(user.deviceId);
     } catch (error) {
-        console.log("Error in getting user", error);
+        console.log("Error ", error);
         res.status(500).json({ message: "Internal server error" });
     }
 });
+
+
 
 router.get("/getDevice" , protectUserRoute ,async (req, res) => {
     try {
@@ -64,8 +120,8 @@ router.put("/addDevice" , protectUserRoute ,async (req, res) => {
     return res.status(200).json(user);
 
 } catch (error) {
-    console.log("Error in getting devices", error);
-    res.status(500).json({ message: "Internal server error" });
+        console.log("Error ", error);
+        res.status(500).json({ message: "Internal server error" });
   }
 });
 router.put("/removeDevice/", protectUserRoute ,async (req, res) => {
@@ -83,7 +139,7 @@ router.put("/removeDevice/", protectUserRoute ,async (req, res) => {
         return res.status(200).json(user);
 
     } catch (error) {
-        console.log("Error in getting devices", error);
+        console.log("Error ", error);
         res.status(500).json({ message: "Internal server error" });
     }
 });
@@ -112,7 +168,7 @@ router.put("/updateTimeOC", protectUserRoute ,async (req, res) => {
         return res.status(200).json({ message: 'Time OC updated successfully'});
 
     } catch (error) {
-        console.log("Error in updating time OC", error);
+        console.log("Error ", error);
         res.status(500).json({ message: "Internal server error" });
     }
 });
@@ -141,7 +197,7 @@ router.put("/updateDeviceName", protectUserRoute ,async (req, res) => {
         return res.status(200).json({ message: 'Device name updated successfully'});
 
     } catch (error) {
-        console.log("Error in updating device name", error);
+        console.log("Error ", error);
         res.status(500).json({ message: "Internal server error" });
     }
 });
@@ -170,7 +226,7 @@ router.put("/sendCmd", protectUserRoute ,async (req, res) => {
         return res.status(200).json({ message: 'Send cmd successfully'});
 
     } catch (error) {
-        console.log("Error in sending command", error);
+        console.log("Error ", error);
         res.status(500).json({ message: "Internal server error" });
     }
 });
