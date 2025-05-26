@@ -158,6 +158,7 @@ router.put("/resetDevice/", protectUserRoute ,async (req, res) => {
         device.deviceName = "Curtain"+device.deviceId;
         device.timeOC = 0;
         device.light = 0;
+        device.percent = 0;
         device.isOpenTime = false;
         device.isCloseTime = false;
         device.OpenTime = null;

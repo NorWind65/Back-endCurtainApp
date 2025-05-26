@@ -30,25 +30,6 @@ router.post("/signDevice", async (req, res) => {
   }
 });
 
-router.put("/resetDevice/" ,async (req, res) => {
-  try {
-      const device_Id  = req.body.device_Id;
-      // check if device not exists
-      const device = await Device.findById(device_Id);     
-      if(!device) {
-          return res.status(400).json({ message: "Invalid Device" });
-      }
-      device.deviceName = "Curtain"+device.deviceId;
-      device.timeOC = 0;
-      await device.save();
-      return res.status(200).json(device);
-
-  } catch (error) {
-      console.log("Error in getting devices", error);
-      res.status(500).json({ message: "Internal server error" });
-  }
-});
-
 // Device 
 router.get("/getDevice", async (req, res) => {
   try {
