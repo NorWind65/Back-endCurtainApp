@@ -27,13 +27,16 @@ const deviceSchema = new mongoose.Schema({
     percent: {
         type: Number,
         default: 0,
+        max: 100,
+        min: 0,
     },
     isOpenTime:{
         type: Boolean,
         default: false,
-    }
+    },
     OpenTime: {
-        type: Date,
+        type: Object,
+        required: false,
         default: null,
     },
     isCloseTime:{
@@ -41,7 +44,8 @@ const deviceSchema = new mongoose.Schema({
         default: false,
     },
     CloseTime: {
-        type: Date,
+        type: Object,
+        required: false,
         default: null,
     },
     autoMode: {

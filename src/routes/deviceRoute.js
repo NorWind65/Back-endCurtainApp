@@ -12,8 +12,8 @@ router.post("/signDevice", async (req, res) => {
       return res.status(400).json({ message: "Please fill all fields" });
     }
     // check if device exists
-    const device = await Device.find({ deviceId });
-    if (!device) {
+    const device = await Device.findOne({ deviceId });
+    if (device) {
       return res.status(400).json({ message: "Device Existed" });
     }
     const newDevice = new Device({
@@ -107,7 +107,79 @@ router.put("/updatePercent", async (req, res) => {
   }
 });
 
-router.put("/updateAutoMode", async )
+router.put("/updateAutoMode", async (req, res) =>{
+       try {
+          const { autoMode } = req.body;
+          const { deviceId } = req.query;
+          if (!deviceId || autoMode === undefined) {
+            return res.status(400).json({ message: "Please fill all fields" });
+          }
+          // check if device exists
+          const device = await Device.findOne({ deviceId });
+          if (!device) {
+            return res.status(400).json({ message: "Device not found" });
+          }
+          device.autoMode = autoMode;
+          await device.save();
+          return res.status(200).json(device);
+        } catch (error) {
+          console.log("Error in updating autoMode", error);
+          res.status(500).json({ message: "Internal server error" });
+        }
+});
 
+router.put("/updateOpenTime", async (req, res) =>{
+       try {
+          const { openTime, isOpenTime } = req.body;
+          const { deviceId } = req.query;
+          if (!deviceId || isOpenTime === undefined) {
+            return res.status(400).json({ message: "Please fill all fields" });
+          }
+          if(isOpenTime && !openTime) {
+            return res.status(400).json({ message: "Please fill open time"  });
+          }
+          // check if device exists
+          const device = await Device.findOne({ deviceId });
+          if (!device) {
+            return res.status(400).json({ message: "Device not found" });
+          }
+          device.isOpenTime = isOpenTime;
+          if(isOpenTime) {
+            device.OpenTime = openTime;
+          }
+          await device.save();
+          return res.status(200).json(device);
+        } catch (error) {
+          console.log("Error in updating openTime", error);
+          res.status(500).json({ message: "Internal server error" });
+        }
+});
+
+router.put("/updateCloseTime", async (req, res) =>{
+       try {
+          const { closeTime, isCloseTime } = req.body;
+          const { deviceId } = req.query;
+          if (!deviceId || isCloseTime === undefined) {
+            return res.status(400).json({ message: "Please fill all fields" });
+          }
+          if(isCloseTime && !closeTime) {
+            return res.status(400).json({ message: "Please fill close time" });
+          }
+          // check if device exists
+          const device = await Device.findOne({ deviceId });
+          if (!device) {
+            return res.status(400).json({ message: "Device not found" });
+          }
+          device.isCloseTime = isCloseTime;
+          if(isCloseTime) {
+            device.CloseTime = closeTime;
+          }
+          await device.save();
+          return res.status(200).json(device);
+        } catch (error) {
+          console.log("Error in updating closeTime", error);
+          res.status(500).json({ message: "Internal server error" });
+        }
+});
 
 export default router;
