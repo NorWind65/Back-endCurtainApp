@@ -6,11 +6,10 @@ import protectUserRoute from "../middleware/user.middleware.js";
 
 const router = express.Router();
 
-
 router.put("/updateInfo", protectUserRoute, async (req, res)=>{
     try{
         const { newEmail, newUserName, newPassword, oldPassword } = req.body;
-        const ID =  req.user._id ; //"681b5f1db01e02ec04bd115b";
+        const ID =  req.user._id ; 
         const user = await User.findById(ID).select("-password");
 
         const isPasswordValid = await user.comparePassword(oldPassword);
@@ -62,7 +61,7 @@ router.put("/updateInfo", protectUserRoute, async (req, res)=>{
 
 router.get("/getDevices", protectUserRoute , async (req, res) => {
     try {
-        const ID =  req.user._id; //"681b5f1db01e02ec04bd115b"; 
+        const ID =  req.user._id;  
         const user = await User.findById(ID).populate("deviceId").select("-password");
         return res.status(200).json(user.deviceId);
     } catch (error) {
@@ -71,17 +70,15 @@ router.get("/getDevices", protectUserRoute , async (req, res) => {
     }
 });
 
-
-
 router.get("/getDevice" , protectUserRoute ,async (req, res) => {
     try {
-        const ID =  req.user._id ; //"681b5f1db01e02ec04bd115b";
+        const ID =  req.user._id ; 
         const user = await User.findById(ID).select("-password");
-        const {deviceId }= req.query;
-
-        const device = await Device.findOne({deviceId});     
-        if (! user.deviceId.includes(deviceId) ) {
-          return res.status(400).json({ message: "Not Found Device" });
+        const { deviceId }= req.query;
+        
+        const device = await Device.findOne( {deviceId} );     
+        if (! user.deviceId.includes(device._id) ) {
+          return res.status(400).json({ message: "Not Found Device"});
         }
 
         return res.status(200).json(device);
@@ -92,43 +89,44 @@ router.get("/getDevice" , protectUserRoute ,async (req, res) => {
 });
 
 router.put("/addDevice" , protectUserRoute ,async (req, res) => {
-  try {
-    const { deviceId, password } = req.body;
-    if (!deviceId || !password) {
-      return res.status(400).json({ message: "Please fill all fields" });
-    }
-    // check if device not exists
-    const device = await Device.findOne({ deviceId });     
-    if(!device) {
-      return res.status(400).json({ message: "Invalid Device" });
-    }
+    try {
+        const { deviceId, password } = req.body;
+        if (!deviceId || !password) {
+        return res.status(400).json({ message: "Please fill all fields" });
+        }
+        // check if device not exists
+        const device = await Device.findOne({ deviceId });     
+        if(!device) {
+        return res.status(400).json({ message: "Invalid Device" });
+        }
 
-    //check if device compare password
-    const isPasswordValid = await device.comparePassword(password);
-    if (!isPasswordValid) {
-      return res.status(400).json({ message: "Invalid Device" });
+        //check if device compare password
+        const isPasswordValid = await device.comparePassword(password);
+        if (!isPasswordValid) {
+        return res.status(400).json({ message: "Invalid Device" });
+        }
+        const ID =  req.user._id; // "681b5f1db01e02ec04bd115b";
+        const user = await User.findById(ID);
+
+        if (user.deviceId.includes(device._id)) {
+        return res.status(400).json({ message: "Device already added to your account" });
+        }
+
+        user.deviceId.push(device._id);
+        await user.save();
+        return res.status(200).json(user);
+
+    } 
+    catch (error) {
+            console.log("Error ", error);
+            res.status(500).json({ message: "Internal server error" });
     }
-    const ID =  req.user._id; // "681b5f1db01e02ec04bd115b";
-    const user = await User.findById(ID);
-
-    if (user.deviceId.includes(device._id)) {
-      return res.status(400).json({ message: "Device already added to your account" });
-    }
-
-    user.deviceId.push(device._id);
-    await user.save();
-    return res.status(200).json(user);
-
-} catch (error) {
-        console.log("Error ", error);
-        res.status(500).json({ message: "Internal server error" });
-  }
 });
 router.put("/removeDevice/", protectUserRoute ,async (req, res) => {
     try {
-        const  deviceId  = req.body.device_Id;
+        const  {deviceId}  = req.body.deviceId;
         // check if device not exists
-        const device = await Device.findById(deviceId);     
+        const device = await Device.findOne({deviceId});     
         if(!device) {
             return res.status(400).json({ message: "Invalid Device" });
         }
@@ -142,6 +140,37 @@ router.put("/removeDevice/", protectUserRoute ,async (req, res) => {
         console.log("Error ", error);
         res.status(500).json({ message: "Internal server error" });
     }
+});
+
+router.put("/resetDevice/", protectUserRoute ,async (req, res) => {
+  try {
+        const deviceId  = req.body.deviceId;
+        // check if device not exists
+        const ID =  req.user._id;
+        const user = await User.findById(ID);     
+        const device = await Device.findOne( {deviceId} );     
+        if (! user.deviceId.includes(device._id) ) {
+          return res.status(400).json({ message: "Not Found Device"});
+        }
+        if(!device) {
+            return res.status(400).json({ message: "Invalid Device" });
+        }
+        device.deviceName = "Curtain"+device.deviceId;
+        device.timeOC = 0;
+        device.light = 0;
+        device.isOpenTime = false;
+        device.isCloseTime = false;
+        device.OpenTime = null;
+        device.CloseTime = null;
+        device.autoMode = false;
+        device.cmd = 'S';
+
+        await device.save();
+        return res.status(200).json(device);
+  } catch (error) {
+      console.log("Error in getting devices", error);
+      res.status(500).json({ message: "Internal server error" });
+  }
 });
 
 router.put("/updateTimeOC", protectUserRoute ,async (req, res) => {
@@ -230,4 +259,5 @@ router.put("/sendCmd", protectUserRoute ,async (req, res) => {
         res.status(500).json({ message: "Internal server error" });
     }
 });
+
 export default router;
