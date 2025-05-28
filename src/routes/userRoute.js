@@ -124,11 +124,11 @@ router.put("/addDevice" , protectUserRoute ,async (req, res) => {
 });
 router.put("/removeDevice/", protectUserRoute ,async (req, res) => {
     try {
-        const  {deviceId}  = req.body.deviceId;
+        const  {deviceId}  = req.body;
         // check if device not exists
         const device = await Device.findOne({deviceId});     
         if(!device) {
-            return res.status(400).json({ message: "Invalid Device" });
+            return res.status(400).json({ message: "Invalid Device" , deviceId});
         }
         const ID =  req.user._id;//  "681b5f1db01e02ec04bd115b"; 
         const user = await User.findById(ID);
