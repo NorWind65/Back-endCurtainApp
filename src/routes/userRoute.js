@@ -9,10 +9,14 @@ const router = express.Router();
 router.put("/updateInfo", protectUserRoute, async (req, res)=>{
     try{
         const { newEmail, newUserName, newPassword, oldPassword } = req.body;
+        if (!newEmail || !newUserName || !newPassword || !oldPassword) {
+            return res.status(400).json({ message: "Please fill all fields" });
+        }
         const ID =  req.user._id ; 
-        const user = await User.findById(ID).select("-password");
-
+        const user = await User.findById(ID);
+        
         const isPasswordValid = await user.comparePassword(oldPassword);
+
         if (!isPasswordValid) {
             return res.status(400).json({ message: "Invalid old Password" });
         }
@@ -31,7 +35,7 @@ router.put("/updateInfo", protectUserRoute, async (req, res)=>{
             }
         }
         if( newEmail != user.email){
-            const existingEmail = await User.findOne( { email } );
+            const existingEmail = await User.findOne( { newEmail } );
             if (existingEmail) {
                 return res.status(400).json({ message: "Email already exists" });
             }
@@ -47,6 +51,7 @@ router.put("/updateInfo", protectUserRoute, async (req, res)=>{
                 id: user._id,
                 email: user.email,
                 username: user.username,
+                deviceId: user.deviceId,
             },
         })
 
