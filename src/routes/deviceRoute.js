@@ -163,4 +163,25 @@ router.put("/updateCloseTime", async (req, res) =>{
         }
 });
 
+router.put("/updateTimeOC", async (req, res) =>{
+       try {
+          const { Length } = req.body;
+          const { deviceId } = req.query;
+          if (!deviceId || !Length === undefined) {
+            return res.status(400).json({ message: "Please fill all fields" });
+          }
+          // check if device exists
+          const device = await Device.findOne({ deviceId });
+          if (!device) {
+            return res.status(400).json({ message: "Device not found" });
+          }
+          device.timeOC = Length * 155;
+          await device.save();
+          return res.status(200).json(device);
+        } catch (error) {
+          console.log("Error in updating timeOC", error);
+          res.status(500).json({ message: "Internal server error" });
+        }
+});
+
 export default router;
